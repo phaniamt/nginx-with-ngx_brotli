@@ -1,6 +1,6 @@
 FROM ubuntu:16.04 AS nginx-build
 ENV DEBIAN_FRONTEND noninteractive
-ENV NGINX_VERSION 1.16.1
+#ENV NGINX_VERSION 1.16.1
 RUN apt-get update -qq && \
 apt install  -qq -y --no-install-recommends --no-install-suggests \
 ca-certificates \
@@ -21,10 +21,10 @@ libgeoip-dev    \
 libcurl4-openssl-dev    \
 openssl \
 curl
-RUN cd ~/ && curl -fSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz && tar zxvf nginx.tar.gz
+RUN cd ~/ && curl -fSL https://nginx.org/download/nginx-$(nginx -v 2>&1 >/dev/null | tail -c 7).tar.gz -o nginx.tar.gz && tar zxvf nginx.tar.gz
 RUN cd ~/ && git clone https://github.com/eustas/ngx_brotli.git && cd ~/ngx_brotli && git submodule update --init
 RUN mkdir -p /opt/ngx_brotli
-RUN cd ~/nginx-$NGINX_VERSION && ./configure --with-compat --add-dynamic-module=../ngx_brotli && make modules && cp objs/*.so /opt/ngx_brotli
+RUN cd ~/nginx-$(nginx -v 2>&1 >/dev/null | tail -c 7) && ./configure --with-compat --add-dynamic-module=../ngx_brotli && make modules && cp objs/*.so /opt/ngx_brotli
 # Install the nginx
 FROM ubuntu:16.04
 ENV DEBIAN_FRONTEND noninteractive
